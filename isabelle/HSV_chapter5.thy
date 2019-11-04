@@ -44,6 +44,42 @@ value "simulate circuit2 \<rho>2"
 value "simulate circuit3 \<rho>2"
 value "simulate circuit4 \<rho>2"
 
+text \<open>A function that switches each pair of wires entering an OR or AND gate\<close>
+
+fun mirror where
+  "mirror (NOT c) = NOT (mirror c)"
+| "mirror (AND c1 c2) = AND (mirror c2) (mirror c1)"
+| "mirror (OR c1 c2) = OR (mirror c2) (mirror c1)"
+| "mirror TRUE = TRUE"
+| "mirror FALSE = FALSE"
+| "mirror (INPUT i) = INPUT i"
+
+value "circuit1"
+value "mirror circuit1"
+value "circuit2"
+value "mirror circuit2"
+
+text \<open>The following non-theorem is easily contradicted.\<close>
+theorem "mirror c = c" 
+  oops
+
+(* TODO *)
+theorem "simulate (mirror c) \<rho> = simulate c \<rho>" oops
+
+fun f :: "nat \<Rightarrow> nat" where
+  "f (Suc (Suc n)) = f n + f (Suc n)"
+| "f (Suc 0) = 1"
+| "f 0 = 1"
+
+thm f.induct
+
+lemma helper: "f n \<ge> n \<and> f n \<ge> 1"
+  by (rule f.induct[of "\<lambda>n. f n \<ge> n \<and> f n \<ge> 1"], auto)
+
+theorem "f n \<ge> n" 
+  using helper by simp
+
+
 text \<open>A function that optimises a circuit by removing pairs of consecutive NOT gates\<close>
 
 fun opt_NOT where
